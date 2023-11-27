@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import type { Upload } from 'ant-design-vue';
 import { defineProps } from 'vue';
 import UploadPhotoModal from './UploadPhotoModal.vue';
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import useUserStore from '../stores/users';
+
 
 const props = defineProps({
     username: {
@@ -13,12 +17,17 @@ const props = defineProps({
         required: true,
     }
 })
+const userStore = useUserStore();
+const { user } = storeToRefs(userStore);
+const route = useRoute();
+const { username : profileUsername } = route.params;
+
 </script>
 <template>
     <div class="userbar-container">
         <div class="top-content">
             <ATypographyTitle :level="2">{{ props.username }}</ATypographyTitle>
-            <UploadPhotoModal />
+            <UploadPhotoModal v-if="user && profileUsername === user.username"/>
         </div>
         <div class="bottom-content">
             <ATypographyTitle :level="5">{{ props.userInfo.posts }} Posts</ATypographyTitle>

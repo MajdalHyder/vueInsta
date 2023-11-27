@@ -1,22 +1,18 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import useUserStore from '../stores/users';
-import { storeToRefs } from 'pinia';
-import { useRouter } from 'vue-router';
+
+
 
 const open = ref<boolean>(false);
-const userStore = useUserStore();
-const { user } = storeToRefs(userStore);
-
-const router = useRouter();
-
-console.log(router.currentRoute.value.params.username);
-
+const caption = ref<string>('');
 
 const showModal = () => {
   open.value = true;
 };
 
+const handleUploadChange = (e: any) => {
+  console.log(e.target.files[0]);
+};
 
 </script>
 
@@ -24,7 +20,8 @@ const showModal = () => {
   <div>
     <AButton class="btn" :disabled="false"  @click="showModal">Upload Photo</AButton>
     <AModal v-model:open="open" title="Upload Photo" @ok="">
-      
+      <input @change="handleUploadChange" type="file" accept=".jpeg,.png">
+      <AInput :maxLength="50" class="input" v-model="caption" placeholder="Caption" />
     </AModal>
   </div>
 </template>  

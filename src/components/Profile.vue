@@ -21,7 +21,7 @@ const data = [
 <template>
     <Container>
         <div class="profile-container">
-            <UserBar username="Majd" :userInfo="{posts: 4, followers: 200, follwing: 400}"/>
+            <UserBar :key="$route?.params?.username" username="Majd" :userInfo="{posts: 4, followers: 200, follwing: 400}"/>
             <ImageGallery :posts="[{
                 id: 1,
                 image: 'https://i.pravatar.cc/300?img=1',

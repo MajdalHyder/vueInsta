@@ -8,10 +8,12 @@ const props = defineProps({
     },
 });
 
+console.log(props.posts);
+
 </script>
 <template>
     <div class="image-gallery-cotainer">
-        <img v-for="post in props.posts" :key="post.id" :src="post.image"/>
+        <img v-for="post in props.posts" :key="post.id" :src="'https://awzcvlthbswhzjyewrrr.supabase.co/storage/v1/object/public/InstaBuck/' + post.url"/>
     </div>
 </template>
 
@@ -26,5 +28,6 @@ img {
     margin: 5px;
     width: 200px;
     border-radius: 8px;
+    object-fit: cover;
 }
 </style>

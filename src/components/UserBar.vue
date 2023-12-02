@@ -15,6 +15,9 @@ const props = defineProps({
     userInfo: {
         type: Object,
         required: true,
+    },
+    addNewPost: {
+        required: true,
     }
 })
 const userStore = useUserStore();
@@ -27,7 +30,7 @@ const { username : profileUsername } = route.params;
     <div class="userbar-container">
         <div class="top-content">
             <ATypographyTitle :level="2">{{ props.username }}</ATypographyTitle>
-            <UploadPhotoModal v-if="user && profileUsername === user.username"/>
+            <UploadPhotoModal :addNewPost="addNewPost" v-if="user && profileUsername === user.username"/>
         </div>
         <div class="bottom-content">
             <ATypographyTitle :level="5">{{ props.userInfo.posts }} Posts</ATypographyTitle>

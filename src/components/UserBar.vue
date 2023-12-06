@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
+import { defineProps, ref, onMounted } from 'vue';
 import UploadPhotoModal from './UploadPhotoModal.vue';
-import { ref, onMounted } from 'vue';
+import { supabase } from '../supabase';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import useUserStore from '../stores/users';
 
 
+
 const props = defineProps({
     username: {
-        type: String,
+        type: [String, Array<String>],
         required: true,
     },
     userInfo: {
@@ -18,6 +19,10 @@ const props = defineProps({
     },
     addNewPost: {
         required: true,
+    },
+    isFollowing: {
+        type: Boolean,
+        required: true,
     }
 })
 const userStore = useUserStore();
@@ -25,12 +30,40 @@ const { user } = storeToRefs(userStore);
 const route = useRoute();
 const { username : profileUsername } = route.params;
 
+
+const followUser = async () => {
+    const { data: currentProfileId } = await supabase.from('users').select('id').eq('username', props.username).single();
+    if (!currentProfileId) return;
+    
+    const { error } = await supabase.from('followers_following').insert([
+        {
+            follower_id: user?.value?.id,
+            following_id: currentProfileId.id,
+        }
+    ])
+    if (error) return console.log(error);
+}
+
+const unfollowUser = async () => {
+    const { data: currentProfileId } = await supabase.from('users').select('id').eq('username', props.username).single();
+    if (!currentProfileId) return;
+
+    const { error } = await supabase.from('followers_following').delete().eq('follower_id', user?.value?.id).eq('following_id', currentProfileId.id);
+    if (error) return console.log(error);
+}
+
 </script>
 <template>
     <div class="userbar-container">
         <div class="top-content">
             <ATypographyTitle :level="2">{{ props.username }}</ATypographyTitle>
-            <UploadPhotoModal :addNewPost="addNewPost" v-if="user && profileUsername === user.username"/>
+            <div v-if="user">
+                <UploadPhotoModal :addNewPost="addNewPost" v-if="user && profileUsername === user.username"/>
+                <div v-else>
+                    <AButton v-if="props.isFollowing" @click="unfollowUser">Following</AButton>
+                    <AButton v-else @click="followUser">Follow</AButton>
+                </div>
+            </div>
         </div>
         <div class="bottom-content">
             <ATypographyTitle :level="5">{{ props.userInfo.posts }} Posts</ATypographyTitle>

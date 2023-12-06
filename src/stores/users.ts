@@ -136,10 +136,10 @@ const useUserStore = defineStore('users', () => {
 
   const getUser = async () => {
     loadingUser.value = true;
-    const {data} = await supabase.auth.getUser();
-
-    if(!data)  {
-      loading.value = false;
+    const {data, error} = await supabase.auth.getUser();
+    
+    if(error)  {
+      loadingUser.value = false;
       return user.value = null;
     }
 

@@ -10,7 +10,7 @@ const searchUserName = ref('');
 const router = useRouter();
 const onSearch = () => {
     if (searchUserName.value) {
-        router.push(`profile/${searchUserName.value}`)
+        router.push({ name: 'profile', params: { username: searchUserName.value } })
         searchUserName.value = '';
     }
 }
@@ -20,12 +20,8 @@ const userStore = useUserStore();
 const { user, loadingUser } = storeToRefs(userStore);
 
 const goToProfile = () => {
-    router.push(`profile/${user?.value?.username}`)
+    router.push({ name: 'profile', params: { username: user?.value?.username }})
 }
-
-
-
-
 
 const handleLogout = async () => {
     await userStore.handleLogout();

@@ -24,9 +24,10 @@ const props = defineProps({
 <template>
     <ACard hoverable style="width: 240px" class="card">
       <template #cover>
-        <img :alt="props.username" :src="props.url" />
+        <img :alt="props.username" :src="'https://awzcvlthbswhzjyewrrr.supabase.co/storage/v1/object/public/InstaBuck/' +props.url" />
       </template>
       <ACardMeta :title="props.username">
+        {{ props.url  }}
         <template #description>{{ props.caption }}</template>
       </ACardMeta>
     </ACard>

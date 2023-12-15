@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import Container from './Container.vue';
-import Card from './Card.vue';
+import Cards from './Cards.vue';
 import useUserStore from '../stores/users';
 import { storeToRefs } from 'pinia';
 import { supabase } from '../supabase';
 import { onMounted, ref } from 'vue';
+import LoginMessage from './LoginMessage.vue';
+
 
 const userStore = useUserStore();
 const timelinePosts = ref<any[]>([]);
@@ -14,16 +16,24 @@ const { user, loadingUser } = storeToRefs(userStore);
 
 const fetchdata = async () => {
     const { data: following } = await supabase
-        .from('followers_following')
-        .select('following_id')
-        .eq('follower_id', 9);
+    .from('followers_following')
+    .select('following_id')
+    .eq('follower_id', user?.value?.id);
     if (!following) return;
-    
+    const followingIds = following.map(f => f.following_id);
+
+    const { data: usernames } = await supabase
+        .from('users')
+        .select(`id,username`)
+        .in('id', followingIds)
+    console.log(usernames);
     const { data: posts } = await supabase
         .from('posts')
         .select()
-        .in('owner_id', following.map((f) => f.following_id));
-    if (posts) timelinePosts.value = posts;
+        .in('owner_id', following.map(f => f.following_id))
+        .order('created_at', { ascending: false });
+    console.log(posts);
+        if (posts) timelinePosts.value = posts;
 }
 
 onMounted(() => {
@@ -36,26 +46,17 @@ onMounted(() => {
 <template>
     <Container>
         <div v-if="!loadingUser">
-            <div v-if="user" class="timeline-container">
-                <Card v-for="post in timelinePosts" 
-                :key="post.id" 
-                :id="post.id" 
-                :url="post.url" 
-                :username="post.username"
-                :caption="post.caption" />
-            </div>
-            <div v-else class="timeline-container">
-                <h1>Log In Please! </h1>
-            </div>
+            <Cards v-if="user" :timelinePosts="timelinePosts"/>
+            <LoginMessage message="Login please" v-else/>
         </div>
-        <div v-else class="spinner">
+        <div v-else class="timeline-spinner">
             <ASpin/>
         </div>
     </Container>
 </template>
 
-<style scoped>
-.spinner {
+<style>
+.timeline-spinner {
     display: flex;
     justify-content: center;
     align-items: center;

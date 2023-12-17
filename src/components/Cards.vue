@@ -1,13 +1,26 @@
 <script setup lang="ts">
 import Card from './Card.vue';
-import { defineProps } from 'vue';
+import { defineProps, type PropType } from 'vue';
+import Observer from './Observer.vue';
+
+interface Posts {
+    id: string | number;
+    url: string;
+    username: string;
+    caption: string;
+
+}
 
 const props = defineProps({
     timelinePosts: {
-        type: Array,
+        type: Object as PropType<Posts>,
         required: true,
     }
 })
+
+const fetchNextSet = () => {
+    console.log('fetching next set');
+}
 </script>
 
 <template>
@@ -18,6 +31,7 @@ const props = defineProps({
         :url="post.url" 
         :username="post.username"
         :caption="post.caption" />
+        <Observer @intersect="fetchNextSet" />
     </div>
 </template>
 

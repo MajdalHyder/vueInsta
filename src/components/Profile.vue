@@ -2,7 +2,7 @@
 import Container from './Container.vue';
 import UserBar from './UserBar.vue';
 import ImageGallery from './ImageGallery.vue';
-import { onMounted, ref, reactive } from 'vue';
+import { onMounted, ref, reactive, type Ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { supabase } from '../supabase';
 import useUserStore from '../stores/users';
@@ -11,7 +11,7 @@ import { storeToRefs } from 'pinia';
 const route = useRoute();
 const userStore = useUserStore();
 const { user: loggedInUser } = storeToRefs(userStore);
-const user = ref(null);
+const user = ref<{id: number; username: string; email: string} | null>(null);
 const { username } = route.params;
 const posts = ref<any[]>([]);
 const profileStats = reactive({
@@ -19,12 +19,11 @@ const profileStats = reactive({
     followers: 0,
     following: 0,
 });
-const loading = ref(false);
-const isFollowing = ref(false);
+const loading = ref<Boolean>(false);
+const isFollowing: Ref<boolean> = ref(false);
 
 
 const fetchIsFollowing = async () => {
-    console.log(loggedInUser.value);
     if (loggedInUser?.value && loggedInUser?.value?.id !== user?.value?.id) {
         const { data } = await supabase
             .from('followers_following')
@@ -36,7 +35,7 @@ const fetchIsFollowing = async () => {
     }
 }
 
-const addNewPost = (post) => {
+const addNewPost = (post: {url: string; owner_id: number; caption: string}) => {
     posts.value.unshift(post)
 }
 

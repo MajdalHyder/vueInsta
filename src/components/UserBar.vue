@@ -21,7 +21,7 @@ const props = defineProps({
         required: true,
     },
     isFollowing: {
-        type: Boolean,
+        type: Boolean<() => Boolean>,
         required: true,
     }
 })

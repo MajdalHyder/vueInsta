@@ -11,7 +11,7 @@ interface newUser {
 interface User {
   email: string;
   username: string;
-  id: string;
+  id: number;
 }
 
 const useUserStore = defineStore('users', () => {

@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink, useRouter, type Router } from 'vue-router'
 import Container from './Container.vue';
 import AuthModal from './AuthModal.vue';
 import useUserStore from '../stores/users';
 import { storeToRefs } from 'pinia';
 
-const searchUserName = ref('');
-const router = useRouter();
+const searchUserName = ref<string>('');
+const router: Router = useRouter();
+
 const onSearch = () => {
-    if (searchUserName.value) {
+    if (searchUserName.value.length) {
         router.push({ name: 'profile', params: { username: searchUserName.value } })
         searchUserName.value = '';
     }
@@ -19,7 +20,7 @@ const userStore = useUserStore();
 
 const { user, loadingUser } = storeToRefs(userStore);
 
-const goToProfile = () => {
+const goToProfile = ():void => {
     router.push({ name: 'profile', params: { username: user?.value?.username }})
 }
 

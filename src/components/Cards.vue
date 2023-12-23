@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import Card from './Card.vue';
-import { defineProps, type PropType } from 'vue';
 import Observer from './Observer.vue';
 import { supabase } from '../supabase';
 import { onMounted, ref } from 'vue';
 import useUserStore from '../stores/users';
 import { storeToRefs } from 'pinia';
+import type { PostgrestSingleResponse } from '@supabase/supabase-js';
 
 interface Posts {
     id: string | number;
@@ -14,7 +14,11 @@ interface Posts {
     caption: string;
 
 }
+interface User {
+    id: number;
+    username: string;
 
+}
 
 const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
@@ -25,14 +29,14 @@ const reachedEnd = ref<boolean>(false);
 
 
 const fetchdata = async () => {
-    const { data: following } = await supabase
+    const { data: following }: PostgrestSingleResponse<{ user: { id: number; username: string; }[]; }[]> = await supabase
         .from('followers_following')
         .select('user:users!followers_following_following_id_fkey(id,username)')
-        .eq('follower_id', user?.value?.id)
+        .eq('follower_id', user?.value?.id);
     if (!following) return;
-    ownerIds.value = following.map(f => {
-        return f.user.id
-    })
+
+    ownerIds.value = following.flatMap(f => f.user.map((user) => user.id));
+
     const { data: dbPosts } = await supabase
         .from('posts')
         .select()
@@ -40,9 +44,10 @@ const fetchdata = async () => {
         .range(0, lastCardIndex.value)
         .order('created_at', { ascending: false });
     if (dbPosts) {
+        const users = following.flatMap(f => f.user);
         posts.value = dbPosts?.map(post => {
-            let user = following.find(follow => follow.user.id === post.owner_id)
-            return { ...post, username: user?.user?.username }
+            let user = users.find(user => user.id === post.owner_id)
+            return { ...post, username: user?.username }
         })
     }
 }
@@ -57,9 +62,9 @@ const fetchNextSet = async () => {
         .select('user:users!followers_following_following_id_fkey(id,username)')
         .eq('follower_id', user?.value?.id)
     if (!following) return;
-    ownerIds.value = following.map(f => {
-        return f.user.id
-    })
+
+    ownerIds.value = following.flatMap(f => f.user.map((user) => user.id));
+
     const { data: dbPosts } = await supabase
         .from('posts')
         .select()
@@ -71,11 +76,12 @@ const fetchNextSet = async () => {
         return;
     }
     if (dbPosts) {
+        const users = following.flatMap(f => f.user);
         posts.value = [
             ...posts.value,
             ...dbPosts?.map(post => {
-                let user = following.find(follow => follow.user.id === post.owner_id)
-                return { ...post, username: user?.user?.username }
+                let user = users.find(user => user.id === post.owner_id)
+                return { ...post, username: user?.username }
             })
         ]
         lastCardIndex.value += 3;

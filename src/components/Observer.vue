@@ -26,8 +26,8 @@ onMounted(() => {
 
 <style scoped>
 .observer {
-    height: 100px;
+    height: 5px;
     width: 100px;
-    background-color: red;
+
 }
 </style>

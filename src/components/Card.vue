@@ -19,12 +19,14 @@ const props = defineProps({
     required: true
   }
 });
+
+const envs = import.meta.env;
 </script>
 
 <template>
     <ACard hoverable style="width: 240px" class="card">
       <template #cover>
-        <img :alt="props.username" :src="'https://awzcvlthbswhzjyewrrr.supabase.co/storage/v1/object/public/InstaBuck/' +props.url" />
+        <img :alt="props.username" :src=" `${envs.VITE_IMAGE_PATH}${props.url}`" />
       </template>
       <ACardMeta :title="props.username">
         {{ props.url  }}

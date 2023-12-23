@@ -8,11 +8,11 @@ const props = defineProps({
     },
 });
 
-
+const envs = import.meta.env;
 </script>
 <template>
     <div class="image-gallery-cotainer">
-        <img v-for="post in props.posts" :key="post.id" :src="'https://awzcvlthbswhzjyewrrr.supabase.co/storage/v1/object/public/InstaBuck/' + post.url"/>
+        <img v-for="post in props.posts" :key="post.id" :src="`${envs.VITE_IMAGE_PATH}${post.url}`"/>
     </div>
 </template>
 
